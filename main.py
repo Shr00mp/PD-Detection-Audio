@@ -1,5 +1,2 @@
 print("Hello again, world")
-print("This is a message merged from the test branch.")
-print("Edit from remote GitHub repository")
-print("Another edit from remote GitHub repo")
-print("An edit from local repo")
+print("Message from test-branch in remote repo")
