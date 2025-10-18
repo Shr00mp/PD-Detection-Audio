@@ -1,2 +1,2 @@
 print("Hello again, world")
-print("Hello from the test-branch")
+print("This is a message merged from the test branch.")
