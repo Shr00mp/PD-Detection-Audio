@@ -1,9 +1,50 @@
 import parselmouth as pm
 from parselmouth.praat import call
 import pandas as pd
-import os
+import statistics
 
 from pprint import pprint
+
+def getFormants(sound, point_process):
+    formants = call(sound, "To Formant (burg)", 0.0025, 5, 5000, 0.025, 50)
+    num_points = call(point_process, "Get number of points")
+
+    f1_list = []
+    f2_list = []
+    f3_list = []
+    f4_list = []
+    
+    # Measure formants only at glottal pulses
+    for point in range(0, num_points):
+        point += 1
+        t = call(point_process, "Get time from index", point)
+        f1 = call(formants, "Get value at time", 1, t, 'Hertz', 'Linear')
+        f2 = call(formants, "Get value at time", 2, t, 'Hertz', 'Linear')
+        f3 = call(formants, "Get value at time", 3, t, 'Hertz', 'Linear')
+        f4 = call(formants, "Get value at time", 4, t, 'Hertz', 'Linear')
+        f1_list.append(f1)
+        f2_list.append(f2)
+        f3_list.append(f3)
+        f4_list.append(f4)
+    
+    f1_list = [f1 for f1 in f1_list if str(f1) != 'nan']
+    f2_list = [f2 for f2 in f2_list if str(f2) != 'nan']
+    f3_list = [f3 for f3 in f3_list if str(f3) != 'nan']
+    f4_list = [f4 for f4 in f4_list if str(f4) != 'nan']
+    
+    # calculate mean formants across pulses
+    f1_mean = statistics.mean(f1_list)
+    f2_mean = statistics.mean(f2_list)
+    f3_mean = statistics.mean(f3_list)
+    f4_mean = statistics.mean(f4_list)
+    
+    return {
+        "num_points": num_points,
+        "f1_mean": f1_mean,
+        "f2_mean": f2_mean,
+        "f3_mean": f3_mean,
+        "f4_mean": f4_mean
+    }
 
 def measurePitch(voice_ID, f0min, f0max, unit):
     sound = pm.Sound(voice_ID) # read the sound
@@ -39,6 +80,8 @@ def measurePitch(voice_ID, f0min, f0max, unit):
     max_int = call(intensity, "Get maximum", 0, 0, "Parabolic")
     intensity_range = max_int - min_int
 
+    pprint(getFormants(sound, point_process))
+    
     return {
         "mean_pitch": mean_F0,
         "std_pitch": std_F0,
