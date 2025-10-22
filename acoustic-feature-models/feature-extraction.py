@@ -37,13 +37,22 @@ def getFormants(sound, point_process):
     f2_mean = statistics.mean(f2_list)
     f3_mean = statistics.mean(f3_list)
     f4_mean = statistics.mean(f4_list)
+
+    # Calculate std of formants
+    f1_std = statistics.stdev(f1_list) if len(f1_list) > 1 else 0
+    f2_std = statistics.stdev(f2_list) if len(f2_list) > 1 else 0
+    f3_std = statistics.stdev(f3_list) if len(f3_list) > 1 else 0
+    f4_std = statistics.stdev(f4_list) if len(f4_list) > 1 else 0
     
     return {
-        "num_points": num_points,
         "f1_mean": f1_mean,
         "f2_mean": f2_mean,
         "f3_mean": f3_mean,
-        "f4_mean": f4_mean
+        "f4_mean": f4_mean,
+        "f1_std": f1_std,
+        "f2_std": f2_std,
+        "f3_std": f3_std,
+        "f4_std": f4_std
     }
 
 def measurePitch(voice_ID, f0min, f0max, unit):
@@ -80,7 +89,8 @@ def measurePitch(voice_ID, f0min, f0max, unit):
     max_int = call(intensity, "Get maximum", 0, 0, "Parabolic")
     intensity_range = max_int - min_int
 
-    pprint(getFormants(sound, point_process))
+    formant_dict = getFormants(sound, point_process)
+    pprint(formant_dict)
     
     return {
         "mean_pitch": mean_F0,
