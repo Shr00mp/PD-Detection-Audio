@@ -55,6 +55,11 @@ def getFormants(sound, point_process):
         "f4_std": f4_std
     }
 
+def getMFCCs(sound):
+    mfcc_object = sound.to_mfcc(number_of_coefficients=13)
+    mfcc_arr = mfcc_object.to_array()
+    print(mfcc_arr.shape)
+
 def measurePitch(voice_ID, f0min, f0max, unit):
     sound = pm.Sound(voice_ID) # read the sound
     # Pitch-related things
@@ -91,6 +96,8 @@ def measurePitch(voice_ID, f0min, f0max, unit):
 
     formant_dict = getFormants(sound, point_process)
     pprint(formant_dict)
+
+    getMFCCs(sound)
     
     return {
         "mean_pitch": mean_F0,
