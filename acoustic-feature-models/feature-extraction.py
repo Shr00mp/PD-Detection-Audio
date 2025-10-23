@@ -2,6 +2,7 @@ import parselmouth as pm
 from parselmouth.praat import call
 import pandas as pd
 import statistics
+import numpy as np
 
 from pprint import pprint
 
@@ -57,18 +58,20 @@ def getFormants(sound, point_process):
 
 def getMFCCs(sound):
     mfcc_object = sound.to_mfcc(number_of_coefficients=13)
-    mfcc_arr = mfcc_object.to_array()
-    print(mfcc_arr.shape)
+    mfcc_arr = mfcc_object.to_array() # shape (14, num of time frames)
+    
+    mfcc_means = np.mean(mfcc_arr, axis=1) # shape (14,)
+    mfcc_stds  = np.std(mfcc_arr, axis=1) # shape (14,)
 
 def measurePitch(voice_ID, f0min, f0max, unit):
     sound = pm.Sound(voice_ID) # read the sound
-    # Pitch-related things
+    # Pitch
     pitch = call(sound, "To Pitch", 0.0, f0min, f0max) #create a praat pitch object
-    mean_F0 = call(pitch, "Get mean", 0, 0, unit) # mean pitch
-    std_F0 = call(pitch, "Get standard deviation", 0 ,0, unit) # std of pitch
-    min_F0 = call(pitch, "Get minimum", 0, 0, unit, "Parabolic") # min pitch
-    max_F0 = call(pitch, "Get maximum", 0, 0, unit, "Parabolic") # max pitch
-    pitch_range = max_F0 - min_F0 # pitch range
+    mean_F0 = call(pitch, "Get mean", 0, 0, unit)
+    std_F0 = call(pitch, "Get standard deviation", 0 ,0, unit)
+    min_F0 = call(pitch, "Get minimum", 0, 0, unit, "Parabolic")
+    max_F0 = call(pitch, "Get maximum", 0, 0, unit, "Parabolic")
+    pitch_range = max_F0 - min_F0
     # Hnr
     harmonicity = call(sound, "To Harmonicity (cc)", 0.01, f0min, 0.1, 1.0)
     hnr = call(harmonicity, "Get mean", 0, 0) # mean hnr
@@ -93,10 +96,10 @@ def measurePitch(voice_ID, f0min, f0max, unit):
     min_int = call(intensity, "Get minimum", 0, 0, "Parabolic")
     max_int = call(intensity, "Get maximum", 0, 0, "Parabolic")
     intensity_range = max_int - min_int
-
+    # Formants
     formant_dict = getFormants(sound, point_process)
     pprint(formant_dict)
-
+    # MFCCs
     getMFCCs(sound)
     
     return {
