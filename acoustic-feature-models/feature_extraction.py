@@ -66,8 +66,8 @@ def getMFCCs(sound):
     # make dictionary, ignoring mfcc0
     mfcc_dict = {}
     for i in range(1, 14):  # 1 through 13
-        mfcc_dict[f"mfcc{i}_mean"] = mfcc_means[i]
-        mfcc_dict[f"mfcc{i}_std"]  = mfcc_stds[i]
+        mfcc_dict[f"mfcc{i}_mean"] = mfcc_means[i].item()
+        mfcc_dict[f"mfcc{i}_std"]  = mfcc_stds[i].item()
 
     return mfcc_dict
 
