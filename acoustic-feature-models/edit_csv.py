@@ -18,6 +18,7 @@ for idx, row in data.iterrows():
     audio_path = "audio_files/" + audio_ID + ".wav"
     feature_dict = getAllFeatures(audio_path, 50, 500, "Hertz")#
     feature_dict["Sample ID"] = audio_ID
+    feature_dict["Label"] = row["Label"]
     features_list.append(feature_dict)
 
 features_df = pd.DataFrame(features_list)
