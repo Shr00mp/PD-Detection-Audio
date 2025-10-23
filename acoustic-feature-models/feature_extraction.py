@@ -63,7 +63,15 @@ def getMFCCs(sound):
     mfcc_means = np.mean(mfcc_arr, axis=1) # shape (14,)
     mfcc_stds  = np.std(mfcc_arr, axis=1) # shape (14,)
 
-def measurePitch(voice_ID, f0min, f0max, unit):
+    # make dictionary, ignoring mfcc0
+    mfcc_dict = {}
+    for i in range(1, 14):  # 1 through 13
+        mfcc_dict[f"mfcc{i}_mean"] = mfcc_means[i]
+        mfcc_dict[f"mfcc{i}_std"]  = mfcc_stds[i]
+
+    return mfcc_dict
+
+def getAllFeatures(voice_ID, f0min, f0max, unit):
     sound = pm.Sound(voice_ID) # read the sound
     # Pitch
     pitch = call(sound, "To Pitch", 0.0, f0min, f0max) #create a praat pitch object
@@ -98,11 +106,10 @@ def measurePitch(voice_ID, f0min, f0max, unit):
     intensity_range = max_int - min_int
     # Formants
     formant_dict = getFormants(sound, point_process)
-    pprint(formant_dict)
     # MFCCs
-    getMFCCs(sound)
+    mfcc_dict = getMFCCs(sound)
     
-    return {
+    feature_dict = {
         "mean_pitch": mean_F0,
         "std_pitch": std_F0,
         "range_pitch": pitch_range,
@@ -123,5 +130,8 @@ def measurePitch(voice_ID, f0min, f0max, unit):
         "range_intensity": intensity_range,
     }
 
+    all_feature_dict = {**feature_dict, **formant_dict, **mfcc_dict}
+    return all_feature_dict
 
-pprint(measurePitch("HC_AH\AH_064F_7AB034C9-72E4-438B-A9B3-AD7FDA1596C5.wav", 50, 500, "Hertz"))
+
+pprint(getAllFeatures("audio_files\AH_064F_7AB034C9-72E4-438B-A9B3-AD7FDA1596C5.wav", 50, 500, "Hertz"))
