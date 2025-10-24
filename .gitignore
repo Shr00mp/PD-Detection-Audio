@@ -1,2 +1,3 @@
 venv/
-acoustic-feature-models/__pycache__/
+acoustic-feature-models/__pycache__
+acoustic-feature-models/KNN/__pycache__
