@@ -10,7 +10,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 
-# filter method using chi-square test
+# filter method with f_classif test
 def univariate_selection(X_train, y_train, X_test):
     select_k_best = SelectKBest(score_func=f_classif, k=15)
     # fit to x_train + transform
