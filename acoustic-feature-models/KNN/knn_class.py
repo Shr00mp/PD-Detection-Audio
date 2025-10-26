@@ -37,7 +37,7 @@ class KNNModel:
         X_train_best = select_k_best.fit_transform(X_train, y_train)
         # DON'T fit to x_test, ONLY transform 
         X_test_best = select_k_best.transform(X_test)
-        print("Filter method selected features:\n" + "\n".join(X_train.columns[select_k_best.get_support()]))
+        # print("Filter method selected features:\n" + "\n".join(X_train.columns[select_k_best.get_support()]))
         if (get_features): return X_train.columns[select_k_best.get_support()]
         else: return X_train_best, X_test_best
 
@@ -49,7 +49,7 @@ class KNNModel:
         X_test_best = rfe.transform(X_test)
         # Note: rfe.get_support() is a boolean mask
         # X_train.columns[rfe.get_support()] has datatype pandas.Index 
-        print("Wrapper method selected features:\n" + "\n".join(X_train.columns[rfe.get_support()]))
+        # print("Wrapper method selected features:\n" + "\n".join(X_train.columns[rfe.get_support()]))
         if (get_features): return X_train.columns[rfe.get_support()]
         else: return X_train_best, X_test_best
     
@@ -63,8 +63,8 @@ class KNNModel:
         # Print importances of features in decreasing order
         feature_importances = pd.Series(importances, index=X_train.columns)
         sorted_importances = feature_importances.sort_values(ascending=False)
-        print("\nImportance of features using rf: ")
-        print(sorted_importances)
+        # print("\nImportance of features using rf: ")
+        # print(sorted_importances)
 
         # Get and return x_train and x_test
         top_features = sorted_importances.head(self.num_features)
@@ -130,19 +130,19 @@ class KNNModel:
             fold_recalls.append(recall_score(y_test, y_pred, pos_label="PwPD"))
             fold_f1_scores.append(f1_score(y_test, y_pred, pos_label="PwPD"))
         
-        print(f"\nFold #{i+1}:")
-        print(f"Accuracies: {fold_accuracies}")
-        print(f"Precisions: {fold_precisions}")
-        print(f"Recalls: {fold_recalls}")
-        print(f"F1 scores: {fold_f1_scores}")
+        # print(f"\nFold #{i+1}:")
+        # print(f"Accuracies: {fold_accuracies}")
+        # print(f"Precisions: {fold_precisions}")
+        # print(f"Recalls: {fold_recalls}")
+        # print(f"F1 scores: {fold_f1_scores}")
         mean_accuracy = np.mean(fold_accuracies)
-        mean_prec = np.mean(fold_precisions)
-        mean_rec = np.mean(fold_recalls)
-        mean_f1 = np.mean(fold_f1_scores)
-        print(f"Average accuracy: {mean_accuracy}")
-        print(f"Average precision: {mean_prec}")
-        print(f"Average recall: {mean_rec}")
-        print(f"Average f1 score: {mean_f1}")
+        # mean_prec = np.mean(fold_precisions)
+        # mean_rec = np.mean(fold_recalls)
+        # mean_f1 = np.mean(fold_f1_scores)
+        # print(f"Average accuracy: {mean_accuracy}")
+        # print(f"Average precision: {mean_prec}")
+        # print(f"Average recall: {mean_rec}")
+        # print(f"Average f1 score: {mean_f1}")
 
         return mean_accuracy
     
@@ -158,13 +158,14 @@ class KNNModel:
                 self.best_k = k
             accuracies.append(acc_score)
 
-        plt.figure(figsize=(8, 5))
-        plt.plot(k_values, accuracies, marker='o', linestyle='-', color='blue')
-        plt.title('KNN Accuracy vs. Number of Neighbors (k)')
-        plt.xlabel('Number of Neighbors (k)')
-        plt.ylabel('Accuracy')
-        plt.grid(True)
-        plt.show()
+        fig, ax = plt.subplots(figsize=(8, 5))
+        ax.plot(k_values, accuracies, marker='o', linestyle='-', color='blue')
+        ax.set_title('KNN Accuracy vs. Number of Neighbors (k)')
+        ax.set_xlabel('Number of Neighbors (k)')
+        ax.set_ylabel('Accuracy')
+        ax.grid(True)
+        plt.close(fig)
+        return fig
 
 
 # df = pd.read_csv("acoustic-feature-models/audio_features.csv")
