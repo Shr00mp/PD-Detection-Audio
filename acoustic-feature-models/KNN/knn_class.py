@@ -12,13 +12,14 @@ import matplotlib.pyplot as plt
 
 class KNNModel:
     def __init__(self, X, Y, do_normalisation, do_feature_selection,
-                 feature_selection_type):
+                 feature_selection_type, num_features):
         self = self
         self.X = X
         self.Y = Y
         self.do_normalisation = do_normalisation
         self.do_feature_selection = do_feature_selection
         self.feature_selection_type = feature_selection_type
+        self.num_features = num_features
         self.best_k = None
         self.best_accuracy = None
     
@@ -31,7 +32,7 @@ class KNNModel:
     
     # filter method with f_classif test
     def univariate_selection(self, X_train, y_train, X_test, get_features):
-        select_k_best = SelectKBest(score_func=f_classif, k=15)
+        select_k_best = SelectKBest(score_func=f_classif, k=self.num_features)
         # fit to x_train + transform
         X_train_best = select_k_best.fit_transform(X_train, y_train)
         # DON'T fit to x_test, ONLY transform 
@@ -42,8 +43,8 @@ class KNNModel:
 
     # wrapper method with logistic regression
     def recursive_selection(self, X_train, y_train, X_test, get_features):
-        model = LogisticRegression()
-        rfe = RFE(model, n_features_to_select=15)
+        model = LogisticRegression(max_iter=1000, solver='liblinear')
+        rfe = RFE(model, n_features_to_select=self.num_features)
         X_train_best = rfe.fit_transform(X_train, y_train)
         X_test_best = rfe.transform(X_test)
         # Note: rfe.get_support() is a boolean mask
@@ -66,7 +67,7 @@ class KNNModel:
         print(sorted_importances)
 
         # Get and return x_train and x_test
-        top_features = sorted_importances.head(15)
+        top_features = sorted_importances.head(self.num_features)
         top_feature_names = top_features.index
         X_train_best = X_train[top_feature_names]
         X_test_best = X_test[top_feature_names]
@@ -166,10 +167,10 @@ class KNNModel:
         plt.show()
 
 
-df = pd.read_csv("acoustic-feature-models/audio_features.csv")
-X = df.drop(columns=["Sample ID", "Label"])  # Features
-Y = df["Label"]  # Labels
+# df = pd.read_csv("acoustic-feature-models/audio_features.csv")
+# X = df.drop(columns=["Sample ID", "Label"])  # Features
+# Y = df["Label"]  # Labels
 
-knn_model = KNNModel(X, Y, True, False, "rf")
-knn_model.plot_k_accuracy(30)
-print(f"\nBest k: {knn_model.best_k} \nAccuracy: {knn_model.best_accuracy}")
+# knn_model = KNNModel(X, Y, True, True, "recursive", 13)
+# knn_model.plot_k_accuracy(30)
+# print(f"\nBest k: {knn_model.best_k} \nAccuracy: {knn_model.best_accuracy}")
